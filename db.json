@@ -1,0 +1,243 @@
+{
+  "world": {
+    "current_time": "1524-03-20 14:05:00",
+    "timeline": [
+      {
+        "id": "EVT_NEW_WORLD_01",
+        "name": "Reverie Council Aftermath",
+        "start_time": "1524-01-01 00:00:00",
+        "deadline_time": "1524-04-01 00:00:00",
+        "status": "Active",
+        "description": "ข่าวลือเรื่องการยุบระบบ 7 เทพโจรสลัดและการเคลื่อนไหวของคณะปฏิวัติ",
+        "consequence_if_missed": "ทหารเรือจะกระจายกำลังไปทั่วโลกใหม่มากขึ้น"
+      },
+      {
+        "id": "EVT_LEGEND_SWORD",
+        "name": "Awakening of Tenrai",
+        "start_time": "1524-03-15 00:00:00",
+        "deadline_time": "1524-03-30 00:00:00",
+        "status": "Active",
+        "description": "มีพายุสายฟ้าผิดปกติที่เกาะร้างแห่งหนึ่ง คาดว่าดาบเท็นไรกำลังตื่น",
+        "consequence_if_missed": "เอเนล หรือ ผู้ใช้สายฟ้าคนอื่นอาจจะได้ดาบไป"
+      }
+    ]
+  },
+  "settings": {
+    "action_costs": {
+      "chat": {
+        "minutes": 15
+      },
+      "fight_skirmish": {
+        "minutes": 45
+      },
+      "fight_boss": {
+        "hours": 2
+      },
+      "explore": {
+        "hours": 3
+      },
+      "rest": {
+        "hours": 8
+      },
+      "travel_local": {
+        "hours": 6
+      }
+    }
+  },
+  "locations": {
+    "Calm Belt": {
+      "region": "Calm Belt / Paradise Border",
+      "owner_npc": "None",
+      "danger_lvl": 60,
+      "connections": {
+        "Amazon Lily": {
+          "travel_days": 1,
+          "req_item": "None"
+        },
+        "Impel Down (Vicinity)": {
+          "travel_days": 2,
+          "req_item": "Marine Ship or Stealth"
+        }
+      },
+      "status": "Stormy Seas"
+    },
+    "Amazon Lily": {
+      "region": "Calm Belt",
+      "owner_npc": "Boa Hancock",
+      "danger_lvl": 80,
+      "connections": {
+        "สวรรค์เข็มขัด": {
+          "travel_days": 1
+        }
+      },
+      "status": "Guarded by Kuja Pirates"
+    }
+  },
+  "player": {
+    "name": "Mosu (โมสุ)",
+    "level": 1,
+    "exp": 0,
+    "traits": {
+      "race": "Fishman (Mantis Shrimp - กั้งตั๊กแตน)",
+      "abilities": [
+        "Mantis Punch (หมัดความเร็วเสียง)",
+        "Water Breathing (หายใจในน้ำ)",
+        "Fishman Karate (คาราเต้เงือก ขั้นต้น)"
+      ],
+      "description": "มนุษย์เงือกสายพันธุ์กั้งตั๊กแตน ผู้ใช้ดาบคาตานะ มีแรงดีดและพลังหมัดมหาศาล"
+    },
+    "stats": {
+      "hp": 230,
+      "stamina": 120,
+      "strength": 50,
+      "speed": 65,
+      "bounty": 1500
+    },
+    "reputation": {
+      "Marines": -10,
+      "Pirates": 10,
+      "Revolutionary": 0,
+      "Fishman Island": 50
+    },
+    "devil_fruit": {
+      "has_fruit": false
+    },
+    "haki": {
+      "kenbunshoku": {
+        "level": 0,
+        "status": "Locked"
+      },
+      "busoshoku": {
+        "level": 0,
+        "status": "Locked"
+      },
+      "haoshoku": {
+        "is_innate": false,
+        "status": "None"
+      }
+    },
+    "inventory": [
+      "Katana (Basic)",
+      "Log Pose",
+      "Berry x100,000",
+      "Cola x5 (Fuel)"
+    ],
+    "vehicle": {
+      "name": "Sea-Phantom GT",
+      "type": "Twin Jet-Dial Water Bike",
+      "creator": "Enzo (Dressrosa)",
+      "status": {
+        "hull_condition": 100,
+        "fuel_dial": 100,
+        "is_deployed": true
+      },
+      "features": [
+        "Aerodynamic Canopy (Sleep Mode)",
+        "Mini Kitchen (Heat Dial)",
+        "Ice Dial Cooler",
+        "Storage (Waterproof)"
+      ],
+      "note": "พาหนะเดินทางความเร็วสูง S+ เน้นดำรงชีวิต ไม่ใช่อาวุธสงคราม"
+    },
+    "current_location": "Aron park",
+    "crew": []
+  },
+  "characters": {
+    "Enel": {
+      "status": "Active",
+      "current_location": "Fairy Vearth (Moon)",
+      "note": "Ruling the moon with robot army",
+      "faction": "God's Army",
+      "level": 50,
+      "exp": 0,
+      "traits": {
+        "race": "Human?",
+        "abilities": [],
+        "description": "ผู้ใช้สายฟ้า และฮาคิสังเกตุ"
+      },
+      "stats": {
+        "hp": 1000,
+        "stamina": 500,
+        "strength": 200,
+        "speed": 900,
+        "bounty": 500000000
+      },
+      "reputation": {
+        "Marines": 0,
+        "Pirates": 0,
+        "Revolutionary": 0,
+        "Fishman Island": 0
+      },
+      "devil_fruit": {
+        "has_fruit": true,
+        "fruit": "Goro Goro no Mi"
+      },
+      "haki": {
+        "kenbunshoku": {
+          "level": 50,
+          "status": "Active"
+        },
+        "busoshoku": {
+          "level": 0,
+          "status": "Locked"
+        },
+        "haoshoku": {
+          "is_innate": true,
+          "status": "None"
+        }
+      },
+      "inventory": []
+    }
+  },
+  "unique_items": {
+    "Mera Mera no Mi": {
+      "type": "Devil Fruit",
+      "current_owner": "Sabo",
+      "location": "With Owner (Revolutionary Army)"
+    },
+    "Ope Ope no Mi": {
+      "type": "Devil Fruit",
+      "current_owner": "Trafalgar Law",
+      "location": "With Owner"
+    }
+  },
+  "world_secrets": {
+    "legendary_drops": [
+      {
+        "id": "sword_tenrai",
+        "name": "Tenrai (เท็นไร)",
+        "type": "Living Sword (Thunder)",
+        "fruit": "Model: Zeus + Thor",
+        "personality": "Lazy & Arrogant",
+        "drop_condition": "????"
+      },
+      {
+        "id": "sword_abyss",
+        "name": "Abyss (อาบิส)",
+        "type": "Living Sword (Darkness)",
+        "fruit": "Model: Lucifer",
+        "personality": "Sadistic & Crazy",
+        "drop_condition": "????"
+      },
+      {
+        "id": "sword_samon",
+        "name": "Samon (ซามง)",
+        "type": "Living Sword (Sand)",
+        "fruit": "Model: Roman Soldier",
+        "personality": "Disciplined",
+        "drop_condition": "????"
+      },
+      {
+        "id": "sword_shiokoku",
+        "name": "Shiokoku (ชิโอโคคุ)",
+        "type": "Living Sword (Time/Force)",
+        "fruit": "Model: Xiang Yu",
+        "personality": "Proud Warlord",
+        "drop_condition": "????"
+      }
+    ]
+  },
+  "log": [
+    "เริ่มออกเดินทางด้วย Sea-Phantom GT คู่ใจ"
+  ]
+}
