@@ -52,11 +52,13 @@
       "connections": {
         "Amazon Lily": {
           "travel_days": 1,
-          "req_item": "None"
+          "req_item": "None",
+          "day_req_for_lock": 1
         },
         "Impel Down (Vicinity)": {
           "travel_days": 2,
-          "req_item": "Marine Ship or Stealth"
+          "req_item": "Marine Ship or Stealth",
+          "day_req_for_lock": 1
         }
       },
       "status": "Stormy Seas"
@@ -66,8 +68,10 @@
       "owner_npc": "Boa Hancock",
       "danger_lvl": 80,
       "connections": {
-        "สวรรค์เข็มขัด": {
-          "travel_days": 1
+        "Calm Belt": {
+          "travel_days": 1,
+          "req_item": "None",
+          "day_req_for_lock": 1
         }
       },
       "status": "Guarded by Kuja Pirates"
