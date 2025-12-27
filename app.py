@@ -61,11 +61,8 @@ with st.sidebar:
     # 1. HEADER & IDENTITY
     st.title(f"🏴‍☠️ {p['name']}")
 
-    # จัดเวลาให้สวยงาม
-    t = w.get('current_time', {})
-    time_str = f"Y{t.get('year', '?')}-{t.get('month', '?'):02}-{t.get('day', '?'):02} {t.get('hour', 0):02}:{t.get('minute', 0):02}"
-
-    st.caption(f"📍 **{p.get('current_location', 'Unknown')}** | 📅 {time_str}")
+    st.write(f"📅 **Time:** {w.get('current_time')}")
+    st.caption(f"📍 **{p.get('current_location', 'Unknown')}**")
 
     # แสดงค่าหัวแบบตัวเลขใหญ่
     bounty_val = p['stats'].get('bounty', 0)
