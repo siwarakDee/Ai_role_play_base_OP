@@ -291,7 +291,7 @@ for message in st.session_state.chat_history:
                         st.markdown("### 👨‍🏫 Gemini (Final)")
                         st.caption("ผ่านการ Cross-check แล้ว")
                         st.code(message.get("gemini_raw", "No Data"), language="markdown")
-                        
+
 # Handle Input
 if prompt := st.chat_input("สั่งการกัปตัน..."):
 
