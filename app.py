@@ -60,6 +60,7 @@ def ask_gemini_crosscheck(gpt_response, full_system_prompt):
     # เราเอาคำสั่งตรวจ ไปแปะไว้หน้าสุด แล้วตามด้วย System Prompt เดิมของเกม
     validator_instruction = f"""
     You are a "Strict Logic Validator" (The Teacher) for a One Piece RPG.
+    You are a Professional One Piece story teller you will improve narrative and conversation to be 100% using fun easy understanding.
 
     [YOUR TASK]
     1. Analyze the **User Action** and **GPT Draft Response** below.
