@@ -256,13 +256,42 @@ with st.sidebar:
 st.header("🌊 One Piece AI RPG: Persistent World")
 
 # Render History
+# for message in st.session_state.chat_history:
+#     with st.chat_message(message["role"]):
+#         st.markdown(message["content"])
+#         if "debug_json" in message:
+#             with st.expander("🔍 System Log"):
+#                 st.code(message["debug_json"], language="json")
 for message in st.session_state.chat_history:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
-        if "debug_json" in message:
-            with st.expander("🔍 System Log"):
-                st.code(message["debug_json"], language="json")
 
+        # แสดง System Log เฉพาะฝั่ง Assistant (AI)
+        if message["role"] == "assistant":
+            with st.expander("🔍 System Log (Debug & Cross-check)"):
+                # สร้าง Tab 3 อันเพื่อแยกข้อมูลให้ดูง่าย
+                tab_json, tab_compare = st.tabs(["💾 JSON Data", "🆚 GPT vs Gemini"])
+
+                # Tab 1: ข้อมูล JSON ที่เอาไปอัปเดต DB
+                with tab_json:
+                    # ใช้ .get กัน Error กรณีข้อความเก่าไม่มี key นี้
+                    st.code(message.get("debug_json", "{}"), language="json")
+
+                # Tab 2: เปรียบเทียบ Raw Response
+                with tab_compare:
+                    c1, c2 = st.columns(2)
+
+                    with c1:
+                        st.markdown("### 🤖 GPT-4o (Draft)")
+                        st.caption("ร่างแรกก่อนตรวจ")
+                        # ใช้ text_area หรือ code เพื่อให้ scroll ได้ถ้าข้อความยาว
+                        st.code(message.get("gpt_raw", "No Data"), language="markdown")
+
+                    with c2:
+                        st.markdown("### 👨‍🏫 Gemini (Final)")
+                        st.caption("ผ่านการ Cross-check แล้ว")
+                        st.code(message.get("gemini_raw", "No Data"), language="markdown")
+                        
 # Handle Input
 if prompt := st.chat_input("สั่งการกัปตัน..."):
 
@@ -477,7 +506,18 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
             ai_msg = {"role": "assistant", "content": story_text}
             if json_str: ai_msg["debug_json"] = json_str
 
-            st.session_state.chat_history.append(ai_msg)
+            # st.session_state.chat_history.append(ai_msg)
+            st.session_state.chat_history.append({
+                "role": "assistant",
+                "content": story_text,  # เนื้อเรื่องที่ผ่านการตัด JSON ออกแล้ว
+                "debug_json": json_str,  # JSON string เพียวๆ
+
+                # >>> เพิ่ม 2 บรรทัดนี้ครับ <<<
+                "gpt_raw": gpt_draft_content,  # ร่างดิบจาก GPT (ก่อนส่งตรวจ)
+                "gemini_raw": final_content  # ผลลัพธ์จาก Gemini (รวมเนื้อเรื่อง+JSON)
+            })
+
+
             save_json(DIALOG_FILE, st.session_state.chat_history)  # <--- บันทึกถาวรตรงนี้
 
             st.rerun()
