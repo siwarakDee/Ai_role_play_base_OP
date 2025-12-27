@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import os
 import re
 import shutil
+import google.generativeai as genai
 
 # ================= CONFIG =================
 if "OPENAI_API_KEY" in st.secrets:
@@ -12,6 +13,14 @@ if "OPENAI_API_KEY" in st.secrets:
 else:
     st.error("ไม่พบ API Key ใน Secrets")
     st.stop()
+
+if "GOOGLE_API_KEY" in st.secrets:
+    google_api_key = st.secrets["GOOGLE_API_KEY"]
+else:
+    st.error("ไม่พบ API Key ใน Secrets")
+    st.stop()
+
+genai.configure(api_key=google_api_key)
 
 client = openai.OpenAI(api_key=api_key)
 
@@ -39,6 +48,82 @@ def add_time(db, days=0, hours=0, minutes=0):
     curr = datetime.strptime(db['world']['current_time'], TIME_FMT)
     new_time = curr + timedelta(days=days, hours=hours, minutes=minutes)
     db['world']['current_time'] = new_time.strftime(TIME_FMT)
+
+
+def ask_gemini_crosscheck(gpt_response, full_system_prompt):
+    """
+    ใช้ Gemini 1.5 Flash ตรวจสอบความถูกต้องของ GPT-4o
+    โดยอ้างอิงข้อมูลจาก full_system_prompt (ที่มี Context ปัจจุบันอยู่แล้ว)
+    """
+
+    # สร้างคำสั่งเฉพาะกิจสำหรับโหมดตรวจงาน (Teacher Mode)
+    # เราเอาคำสั่งตรวจ ไปแปะไว้หน้าสุด แล้วตามด้วย System Prompt เดิมของเกม
+    validator_instruction = f"""
+    You are a "Strict Logic Validator" (The Teacher) for a One Piece RPG.
+
+    [YOUR TASK]
+    1. Analyze the **User Action** and **GPT Draft Response** below.
+    2. Cross-check against the **Reference Context & Rules** provided at the bottom.
+       - **Location Consistency:** No teleporting (e.g., East Blue -> Laugh Tale).
+       - **Stat Logic:** Low level cannot beat High level/Boss.
+       - **Inventory:** Cannot use items they don't have.
+    3. **DECISION:**
+       - IF Logical: Output the Draft Response EXACTLY as is.
+       - IF Illogical/Hallucination: **REWRITE** the Narrative and JSON to be realistic (e.g., make them fail or get lost).
+    4. **Improve the conversation and narrative base on One piece** 
+
+    [STRICT OUTPUT FORMAT]
+        You must follow this layout exactly:
+    1. **[Event]:** improve from given full_system_prompt
+    2. **[NPC]:** (NPC Name says or NPC actions "..." - Only if NPC is present) improve from given full_system_prompt
+    3. **[Result]:** (Summary: Success/Failure, HP loss, Location change status, etc) crosscheck and correcting the result.
+        
+    4. **Choices:**
+        1. [Choice A]
+        2. [Choice B]
+        3. [Choice C]        
+    
+    5. **JSON Block:** strictly at the end.
+       Format: 
+       ```json 
+       {{ 
+         "time_passed": {{ "days": 0, "hours": 0, "minutes": 0 }},
+         "log_entry": "Summary of what happened",
+         "player": {{...}}, 
+         "world": {{...}},
+         "characters": {{...}},
+         "locations": {{...}},
+         "unique_items": {{...}}
+       }} 
+       ```
+ 
+
+    =========================================
+    [REFERENCE CONTEXT & RULES FROM GAME MASTER]
+    {full_system_prompt} 
+    =========================================
+    """
+
+    # เนื้อหาที่จะส่งให้ตรวจ
+    content_to_review = f"""
+    --- DRAFT RESPONSE (FROM GPT) ---
+    {gpt_response}
+    """
+
+    try:
+        # ใช้ Flash เพื่อความเร็ว
+        model = genai.GenerativeModel(
+            model_name='gemini-1.5-flash',
+            system_instruction=validator_instruction
+        )
+
+        # ส่งไปตรวจ
+        response = model.generate_content(content_to_review)
+        return response.text
+
+    except Exception as e:
+        print(f"[Gemini Crosscheck Error]: {e}")
+        return gpt_response  # ถ้า Gemini ล่ม ให้ใช้ของ GPT ไปก่อน
 
 
 # ================= UI SETUP =================
@@ -167,9 +252,6 @@ with st.sidebar:
         save_json(DIALOG_FILE, [])
         st.rerun()
 
-
-
-
 # --- MAIN CHAT ---
 st.header("🌊 One Piece AI RPG: Persistent World")
 
@@ -234,9 +316,9 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
     
     [STRICT OUTPUT FORMAT]
         You must follow this layout exactly:
-    1. **[Event]:** (Short description of what happened, 2-3 lines max. Focus on Action/Result)
-    2. **[NPC]:** (NPC Name says "..." - Only if NPC is present)
-    3. **[Result]:** (Summary: Success/Failure, HP loss, Location change status)
+    1. **[Event]:** (Short description of what happened, 3-5 lines max. Focus on Action/Result)
+    2. **[NPC]:** (NPC Name says or NPC actions "..." - Only if NPC is present)
+    3. **[Result]:** (Summary: Success/Failure, HP loss, Location change status, etc)
         
     4. **Choices:**
         1. [Choice A]
@@ -278,16 +360,21 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
                 messages=messages_payload,
                 temperature=0.5,
             )
-            content = response.choices[0].message.content
+            gpt_draft_content = response.choices[0].message.content
+
+            final_content = ask_gemini_crosscheck(
+                gpt_response=gpt_draft_content,
+                full_system_prompt=system_prompt
+            )
 
             # Extract JSON
-            json_match = re.search(r"```json(.*?)```", content, re.DOTALL)
+            json_match = re.search(r"```json(.*?)```", final_content, re.DOTALL)
 
-            story_text = content
+            story_text = final_content
             json_str = ""
 
             if json_match:
-                story_text = content.replace(json_match.group(0), "").strip()
+                story_text = final_content.replace(json_match.group(0), "").strip()
                 print(story_text)  # แสดงเนื้อเรื่อง
 
                 # ดึง JSON string ออกมาแปลงเป็น Dict
@@ -314,9 +401,7 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
                         # Inventory: เขียนทับเลย (เพราะ AI มักส่ง list ล่าสุดมา)
                         if 'inventory' in p_up: db['player']['inventory'] = p_up['inventory']
                         # Location: เช็คความชัวร์
-                        if 'location' in p_up:
-                            db['player']['location'] = p_up['location']
-                        elif 'current_location' in p_up:
+                        if 'current_location' in p_up:
                             db['player']['location'] = p_up['current_location']
                         # Stats: ใช้ .update() เพื่อแก้เฉพาะค่าที่เปลี่ยน
                         if 'stats' in p_up: db['player']['stats'].update(p_up['stats'])
@@ -327,6 +412,12 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
                         # Vehicle: (เผื่อรถพัง)
                         if 'vehicle' in p_up and 'status' in p_up['vehicle']:
                             db['player']['vehicle']['status'].update(p_up['vehicle']['status'])
+                        if 'exp' in p_up: db['player']['exp'].update(p_up['exp'])
+                        if 'level' in p_up: db['player']['level'].update(p_up['level'])
+                        if 'abilities' in p_up: db['player']['traits']['abilities'].update(p_up['abilities'])
+                        if 'devil_fruit' in p_up: db['player']['devil_fruit'].update(p_up['devil_fruit'])
+                        if 'crew' in p_up: db['player']['crew'].update(p_up['crew'])
+                        if 'haki' in p_up: db['player']['haki'].update(p_up['haki'])
 
                     # 4. อัปเดต World / Timeline
                     if 'world' in data:
