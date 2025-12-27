@@ -92,6 +92,7 @@
     },
     "stats": {
       "hp": 230,
+      "hp_percentage": 100,
       "stamina": 120,
       "strength": 50,
       "speed": 65,
@@ -154,6 +155,7 @@
       "faction": "God's Army",
       "level": 50,
       "exp": 0,
+      "friendship": 0,
       "traits": {
         "race": "Human?",
         "abilities": [],
@@ -161,6 +163,7 @@
       },
       "stats": {
         "hp": 1000,
+        "hp_percentage": 100,
         "stamina": 500,
         "strength": 200,
         "speed": 900,
