@@ -4,6 +4,7 @@ import openai
 from datetime import datetime, timedelta
 import os
 import re
+import shutil
 
 # ================= CONFIG =================
 if "OPENAI_API_KEY" in st.secrets:
@@ -154,9 +155,20 @@ with st.sidebar:
 
     # 6. SYSTEM CONTROLS
     if st.button("🗑️ Reset Story", type="primary", use_container_width=True):
+
+        try:
+            # ก็อปปี้ไฟล์ db_backup.json มาทับ db.json
+            shutil.copy('db_backup.json', 'db.json')
+            print("[System]: Database restored from backup.")
+        except FileNotFoundError:
+            st.error("ไม่พบไฟล์ db_backup.json! กรุณาสร้างไฟล์ backup ไว้ก่อนครับ")
+
         st.session_state.chat_history = []
         save_json(DIALOG_FILE, [])
         st.rerun()
+
+
+
 
 # --- MAIN CHAT ---
 st.header("🌊 One Piece AI RPG: Persistent World")
