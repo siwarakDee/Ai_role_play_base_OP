@@ -51,45 +51,38 @@ def add_time(db, days=0, hours=0, minutes=0):
 
 
 def ask_gemini_crosscheck(gpt_response, full_system_prompt):
-    """
-    ใช้ Gemini 1.5 Flash ตรวจสอบความถูกต้องของ GPT-4o
-    โดยอ้างอิงข้อมูลจาก full_system_prompt (ที่มี Context ปัจจุบันอยู่แล้ว)
-    """
-
-    # สร้างคำสั่งเฉพาะกิจสำหรับโหมดตรวจงาน (Teacher Mode)
-    # เราเอาคำสั่งตรวจ ไปแปะไว้หน้าสุด แล้วตามด้วย System Prompt เดิมของเกม
     validator_instruction = f"""
-    You are a "Strict Logic Validator" (The Teacher) for a One Piece RPG.
-    You are a Professional One Piece story teller you will improve narrative and conversation to be 100% using fun easy understanding.
+    You are the "Editor-in-Chief" for a One Piece RPG.
+    Your goal is to **CROSS-CHECK Logic** AND **REWRITE Narrative** to be more exciting.
 
-    [YOUR TASK]
-    1. Analyze the **User Action** and **GPT Draft Response** below.
-    2. Cross-check against the **Reference Context & Rules** provided at the bottom.
-       - **Location Consistency:** No teleporting (e.g., East Blue -> Laugh Tale).
-       - **Stat Logic:** Low level cannot beat High level/Boss.
-       - **Inventory:** Cannot use items they don't have.
-    3. **DECISION:**
-       - IF Logical: Output the Draft Response EXACTLY as is.
-       - IF Illogical/Hallucination: **REWRITE** the Narrative and JSON to be realistic (e.g., make them fail or get lost).
-    4. **Improve the conversation and narrative base on One piece** 
+    [YOUR MISSION]
+    1. **Analyze:** Read the GPT Draft Response below.
+    2. **Security Check (Logic Gate):**
+       - **Teleport Hack:** Did they move instantly across oceans? (e.g. East Blue -> New World). -> IF YES: REWRITE to "Lost at sea" or "Storm blocked".
+       - **God Mode:** Did Lvl 1 beat a Boss? -> IF YES: REWRITE to "Instantly Defeated".
+       - **Item Hack:** Used item not in inventory? -> IF YES: REWRITE to "Item not found".
+    3. **Narrative Polish (MANDATORY):**
+       - **DO NOT just copy the draft.** Even if the logic is correct, you MUST IMPROVE it.
+       - **REWRITE** the `[Event]` and `[NPC]` sections to be "One Piece Style" (Dramatic, Funny, Emotional, Action-packed).
+       - Add Sound Effects (e.g., *Doom!!*, *Fwoosh!*) and character tone.
+    4. 3. **JSON Synchronization (CRITICAL):**
+       - **Do NOT blindly copy the Draft JSON.**
+       - If you changed the outcome (e.g. Success -> Fail), you **MUST** modify the JSON values (HP, Inventory, Location) to match YOUR new story.
+       - *Example:* If you wrote that the player "got hit by a cannonball", the JSON `player.stats.hp` MUST decrease.
+       - *Example:* If you wrote that "The treasure was fake", the JSON `player.inventory` MUST NOT have the treasure.
 
     [STRICT OUTPUT FORMAT]
-        You must follow this layout exactly:
-    1. **[Event]:** improve from given full_system_prompt
-    2. **[NPC]:** (NPC Name says or NPC actions "..." - Only if NPC is present) improve from given full_system_prompt
-    3. **[Result]:** (Summary: Success/Failure, HP loss, Location change status, etc) crosscheck and correcting the result.
-        
-    4. **Choices:**
-        1. [Choice A]
-        2. [Choice B]
-        3. [Choice C]        
-    
-    5. **JSON Block:** strictly at the end.
+    1. **[Event]:** (Rewrite this to be exciting, ~3-5 lines)
+    2. **[NPC]:** (Add lively dialogue/action. If none, keep empty)
+    3. **[Result]:** (Clear summary of consequences, fix if logic was wrong)
+    4. **Choices:** (Keep 3 choices)
+
+    5. **JSON Block:** strictly at the end. Recheck json value is 
        Format: 
        ```json 
        {{ 
          "time_passed": {{ "days": 0, "hours": 0, "minutes": 0 }},
-         "log_entry": "Summary of what happened",
+         "log_entry": "Summary log",
          "player": {{...}}, 
          "world": {{...}},
          "characters": {{...}},
@@ -97,17 +90,16 @@ def ask_gemini_crosscheck(gpt_response, full_system_prompt):
          "unique_items": {{...}}
        }} 
        ```
- 
 
     =========================================
-    [REFERENCE CONTEXT & RULES FROM GAME MASTER]
+    [REFERENCE RULES & CONTEXT]
     {full_system_prompt} 
     =========================================
     """
 
-    # เนื้อหาที่จะส่งให้ตรวจ
+    # ส่งเนื้อหาให้ตรวจ
     content_to_review = f"""
-    --- DRAFT RESPONSE (FROM GPT) ---
+    --- DRAFT RESPONSE TO IMPROVE (FROM GPT) ---
     {gpt_response}
     """
 
@@ -118,7 +110,6 @@ def ask_gemini_crosscheck(gpt_response, full_system_prompt):
             system_instruction=validator_instruction
         )
 
-        # ส่งไปตรวจ
         response = model.generate_content(content_to_review)
         return response.text
 
