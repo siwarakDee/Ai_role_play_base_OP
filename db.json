@@ -79,8 +79,6 @@
   },
   "player": {
     "name": "Mosu (โมสุ)",
-    "level": 1,
-    "exp": 0,
     "traits": {
       "race": "Fishman (Mantis Shrimp - กั้งตั๊กแตน)",
       "abilities": [
@@ -91,11 +89,11 @@
       "description": "มนุษย์เงือกสายพันธุ์กั้งตั๊กแตน ผู้ใช้ดาบคาตานะ มีแรงดีดและพลังหมัดมหาศาล"
     },
     "stats": {
-      "hp": 230,
+      "hp": 550,
       "hp_percentage": 100,
       "stamina": 120,
-      "strength": 50,
-      "speed": 65,
+      "strength": 130,
+      "speed": 105,
       "bounty": 1500
     },
     "reputation": {
@@ -153,8 +151,6 @@
       "current_location": "Fairy Vearth (Moon)",
       "note": "Ruling the moon with robot army",
       "faction": "God's Army",
-      "level": 50,
-      "exp": 0,
       "friendship": 0,
       "traits": {
         "race": "Human?",
@@ -162,11 +158,11 @@
         "description": "ผู้ใช้สายฟ้า และฮาคิสังเกตุ"
       },
       "stats": {
-        "hp": 1000,
+        "hp": 150000,
         "hp_percentage": 100,
-        "stamina": 500,
-        "strength": 200,
-        "speed": 900,
+        "stamina": 1300,
+        "strength": 1300,
+        "speed": 1300,
         "bounty": 500000000
       },
       "reputation": {

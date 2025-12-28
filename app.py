@@ -158,10 +158,7 @@ with st.sidebar:
     st.progress(min(stam_val / 200, 1.0), text=f"⚡ Stamina: {stam_val}")
 
     # 3. BASIC STATS (Grid Layout)
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Lvl", p.get('level', 1))
-    exp_val = p.get('exp', 0)
-    st.metric(label="Exp", value=f"{exp_val:,}")
+    c2, c3 = st.columns(3)
     c2.metric("STR", p['stats'].get('strength', 0))
     c3.metric("SPD", p['stats'].get('speed', 0))
 
@@ -334,7 +331,7 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
        - **Grand Line Physics:** You CANNOT go straight to 'Laugh Tale' (Raftel) or 'New World' from 'East Blue'. You must follow the route: East Blue -> Reverse Mountain -> Paradise -> New World.
        - **Laugh Tale Lock:** Attempting to go to Laugh Tale without 4 Road Poneglyphs results in getting lost in the mist/storms forever.
        - **EXCEPTION:** 'Bartholomew Kuma' crew member allows Fast Travel (ignores connection).
-    5. **Battle System:** Analyze Stats. Do NOT let low-level players beat Bosses.
+    5. **Battle System:** Analyze Stats. Do NOT let low-stats players beat Bosses.
     6. **World Expansion (NEW!):** - IF the story introduces a **NEW Named Character** (NPC), **NEW Location**, or **NEW Unique Item** (One-of-a-kind), you MUST generate their full data stats into JSON BLOCK.
        - (New means not in DB yet)
        - Do not generate data for generic mobs (e.g., "Marine Soldier A"). Only for significant entities.
@@ -349,6 +346,28 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
     1. **[Event]:** (Short description of what happened, 3-5 lines max. Focus on Action/Result)
     2. **[NPC]:** (NPC Name says or NPC actions "..." - Only if NPC is present)
     3. **[Result]:** (Summary: Success/Failure, HP loss, Location change status, etc)
+    
+    Stats MAX
+    HP 1000000
+    stamina 50000
+    strength 5000
+    speed 5000
+    
+    [Stats Cap]
+    Normal people -> HP 10 stamina 10 strength 10 speed 10
+    Normal Navy -> HP 50 stamina 20 strength 20 speed 20
+    Special race,Super nova (Starter) -> HP 500 stamina 100 strength 100 speed 100
+    Normal Strong Navy -> HP 1000 stamina 150 strength 150 speed 150
+    Elite Strong Navy(trooper level) -> HP 5000 stamina 300 strength 300 speed 300
+    Elite Strong Navy(Commander level) -> HP 20000 stamina 600 strength 600 speed 600
+    Special agent (Starter), New world level -> HP 50000 stamina 1000 strength 1000 speed 1000
+    Vice admiral -> HP 150000 stamina 1300 strength 1300 speed 1300
+    worse generation (Start in new world) -> HP 200000 stamina 15000 strength 1500 speed 1500
+    Yonko general (King, Katakuri) -> HP 400000 stamina 20000 strength 2000 speed 2000
+    Admiral -> HP 650000 stamina 30000 strength 3000 speed 3000
+    Yonko -> HP 800000 stamina 40000 strength 4000 speed 4000
+    Beast(Garp,Roger) -> HP 900000 stamina 45000 strength 4500 speed 4500
+    Last boss -> HP 1000000 stamina 50000 strength 5000 speed 5000
         
     4. **Choices:**
         1. [Choice A]
@@ -445,10 +464,6 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
                         if 'abilities' in p_up:
                             if 'traits' not in db['player']: db['player']['traits'] = {}
                             db['player']['traits']['abilities'] = p_up['abilities']
-
-                        # Level & Exp (Int)
-                        if 'exp' in p_up: db['player']['exp'] = p_up['exp']
-                        if 'level' in p_up: db['player']['level'] = p_up['level']
 
                         # Stats (Dict)
                         if 'stats' in p_up: db['player']['stats'].update(p_up['stats'])
