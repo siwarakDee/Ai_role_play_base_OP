@@ -154,8 +154,8 @@ with st.sidebar:
     st.progress(min(hp_pct, 1.0), text=f"❤️ HP: {p['stats']['hp']}")
 
     # Stamina Bar (สมมติ Max 200 หรือปรับตาม Logic เกม)
-    stam_val = p['stats'].get('stamina', 0)
-    st.progress(min(stam_val / 200, 1.0), text=f"⚡ Stamina: {stam_val}")
+    stamina_pct = p['stats'].get('stamina_percent', 100) / 100.0
+    st.progress(min(stamina_pct, 1.0), text=f"⚡ Stamina: {p['stats']['stamina']}")
 
     # 3. BASIC STATS (Grid Layout)
     c1, c2 = st.columns(2)
@@ -461,9 +461,9 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
                         if 'crew' in p_up: db['player']['crew'] = p_up['crew']
 
                         # Abilities (List)
-                        if 'abilities' in p_up:
+                        if 'traits' in p_up and 'abilities' in p_up['traits']:
                             if 'traits' not in db['player']: db['player']['traits'] = {}
-                            db['player']['traits']['abilities'] = p_up['abilities']
+                            db['player']['traits']['abilities'] = p_up['traits']['abilities']
 
                         # Stats (Dict)
                         if 'stats' in p_up: db['player']['stats'].update(p_up['stats'])

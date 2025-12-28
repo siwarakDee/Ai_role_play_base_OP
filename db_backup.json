@@ -84,7 +84,8 @@
       "abilities": [
         "Mantis Punch (หมัดความเร็วเสียง)",
         "Water Breathing (หายใจในน้ำ)",
-        "Fishman Karate (คาราเต้เงือก ขั้นต้น)"
+        "Fishman Karate (คาราเต้เงือก ขั้นต้น)",
+        "Iai Trisula Slash 500 Heads (Iai with mantis punch speed in fishman style Mosu original) "
       ],
       "description": "มนุษย์เงือกสายพันธุ์กั้งตั๊กแตน ผู้ใช้ดาบคาตานะ มีแรงดีดและพลังหมัดมหาศาล"
     },
@@ -92,8 +93,9 @@
       "hp": 550,
       "hp_percentage": 100,
       "stamina": 120,
-      "strength": 130,
-      "speed": 105,
+      "stamina_percent": 100,
+      "strength": 140,
+      "speed": 115,
       "bounty": 1500
     },
     "reputation": {
@@ -161,6 +163,7 @@
         "hp": 150000,
         "hp_percentage": 100,
         "stamina": 1300,
+        "stamina_percent": 100,
         "strength": 1300,
         "speed": 1300,
         "bounty": 500000000
@@ -190,6 +193,33 @@
         }
       },
       "inventory": []
+    },
+    "Hachi": {
+      "status": "Active",
+      "current_location": "Aron park",
+      "friendship": 60,
+      "traits": {
+        "race": "Fishman (Octopus)",
+        "abilities": [
+          "Swordsmanship",
+          "Ink Spray"
+        ],
+        "description": "นักดาบปลาหมึกแห่งอารอนพาร์ค"
+      },
+      "stats": {
+        "hp": 300,
+        "hp_percentage": 100,
+        "stamina": 100,
+        "stamina_percent": 100,
+        "strength": 90,
+        "speed": 80
+      },
+      "reputation": {
+        "Marines": 0,
+        "Pirates": 20,
+        "Revolutionary": 0,
+        "Fishman Island": 40
+      }
     }
   },
   "unique_items": {
@@ -241,6 +271,8 @@
     ]
   },
   "log": [
-    "เริ่มออกเดินทางด้วย Sea-Phantom GT คู่ใจ"
+    "เริ่มออกเดินทางด้วย Sea-Phantom GT คู่ใจ",
+    "Mosu trained diligently every day, improving his sword skills and speed significantly.",
+    "โมสุสำเร็จในการสร้างท่าใหม่ 'อิไอ ตรีศูรสะบั้น 500เศียร' ที่รวดเร็วและทรงพลัง"
   ]
 }
