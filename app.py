@@ -440,6 +440,53 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
                         if 'crew' in p_up: db['player']['crew'].update(p_up['crew'])
                         if 'haki' in p_up: db['player']['haki'].update(p_up['haki'])
 
+                    if 'player' in data:
+                        p_up = data['player']
+
+                        # Inventory (List)
+                        if 'inventory' in p_up: db['player']['inventory'] = p_up['inventory']
+
+                        # Location (String)
+                        if 'current_location' in p_up:
+                            db['player']['current_location'] = p_up['current_location']
+
+                        # Crew (List)
+                        if 'crew' in p_up: db['player']['crew'] = p_up['crew']
+
+                        # Abilities (List)
+                        if 'abilities' in p_up:
+                            if 'traits' not in db['player']: db['player']['traits'] = {}
+                            db['player']['traits']['abilities'] = p_up['abilities']
+
+                        # Level & Exp (Int)
+                        if 'exp' in p_up: db['player']['exp'] = p_up['exp']
+                        if 'level' in p_up: db['player']['level'] = p_up['level']
+
+                        # Stats (Dict)
+                        if 'stats' in p_up: db['player']['stats'].update(p_up['stats'])
+
+                        # Reputation (Dict)
+                        if 'reputation' in p_up:
+                            if 'reputation' not in db['player']: db['player']['reputation'] = {}
+                            db['player']['reputation'].update(p_up['reputation'])
+
+                        # Vehicle (Dict)
+                        if 'vehicle' in p_up:
+                            if 'vehicle' not in db['player']: db['player']['vehicle'] = {}
+                            if 'status' in p_up['vehicle']:
+                                if 'status' not in db['player']['vehicle']: db['player']['vehicle']['status'] = {}
+                                db['player']['vehicle']['status'].update(p_up['vehicle']['status'])
+
+                        # Devil Fruit (Dict)
+                        if 'devil_fruit' in p_up:
+                            if 'devil_fruit' not in db['player']: db['player']['devil_fruit'] = {}
+                            db['player']['devil_fruit'].update(p_up['devil_fruit'])
+
+                        # Haki (Dict)
+                        if 'haki' in p_up:
+                            if 'haki' not in db['player']: db['player']['haki'] = {}
+                            db['player']['haki'].update(p_up['haki'])
+
                     # 4. อัปเดต World / Timeline
                     if 'world' in data:
                         w_up = data['world']
@@ -505,8 +552,8 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
                 "debug_json": json_str,  # JSON string เพียวๆ
 
                 # >>> เพิ่ม 2 บรรทัดนี้ครับ <<<
-                "gpt_raw": gpt_draft_content,  # ร่างดิบจาก GPT (ก่อนส่งตรวจ)
-                "gemini_raw": final_content  # ผลลัพธ์จาก Gemini (รวมเนื้อเรื่อง+JSON)
+                "gpt_raw": gpt_draft_content,
+                "gemini_raw": final_content
             })
 
 
