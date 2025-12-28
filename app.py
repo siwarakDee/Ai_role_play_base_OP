@@ -106,7 +106,7 @@ def ask_gemini_crosscheck(gpt_response, full_system_prompt):
     try:
         # ใช้ Flash เพื่อความเร็ว
         model = genai.GenerativeModel(
-            model_name='gemini-1.5-flash',
+            model_name='gemini-1.5-flash-latest',
             system_instruction=validator_instruction
         )
 
