@@ -158,9 +158,9 @@ with st.sidebar:
     st.progress(min(stam_val / 200, 1.0), text=f"⚡ Stamina: {stam_val}")
 
     # 3. BASIC STATS (Grid Layout)
-    c2, c3 = st.columns(3)
-    c2.metric("STR", p['stats'].get('strength', 0))
-    c3.metric("SPD", p['stats'].get('speed', 0))
+    c1, c2 = st.columns(2)
+    c1.metric("STR", p['stats'].get('strength', 0))
+    c2.metric("SPD", p['stats'].get('speed', 0))
 
     st.divider()
 
