@@ -157,6 +157,9 @@ with st.sidebar:
     stam_val = p['stats'].get('stamina', 0)
     st.progress(min(stam_val / 200, 1.0), text=f"⚡ Stamina: {stam_val}")
 
+    exp_val = p.get('exp',0)
+    st.metric(label="Exp", value=f"{exp_val:,}")
+    
     # 3. BASIC STATS (Grid Layout)
     c1, c2, c3 = st.columns(3)
     c1.metric("Lvl", p.get('level', 1))
