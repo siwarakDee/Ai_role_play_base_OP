@@ -232,6 +232,17 @@ with st.sidebar:
 
     st.divider()
 
+    with st.expander("🛠️ Debug: Raw Database (JSON)", expanded=False):
+
+        # ปุ่มกด Refresh เผื่อค่าไม่ไม่อัปเดต
+        if st.button("🔄 Refresh Data"):
+            st.rerun()
+
+        # แสดง JSON ทั้งก้อน (Interactive: กดลูกศรพับ/กางดูได้เลย)
+        st.json(db)
+
+    st.divider()
+
     # 6. SYSTEM CONTROLS
     if st.button("🗑️ Reset Story", type="primary", use_container_width=True):
 
@@ -324,7 +335,9 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
        - **Laugh Tale Lock:** Attempting to go to Laugh Tale without 4 Road Poneglyphs results in getting lost in the mist/storms forever.
        - **EXCEPTION:** 'Bartholomew Kuma' crew member allows Fast Travel (ignores connection).
     5. **Battle System:** Analyze Stats. Do NOT let low-level players beat Bosses.
-    6. **New Discoveries:** If new unique items/locations/chars appear, return them in JSON.
+    6. **World Expansion (NEW!):** - IF the story introduces a **NEW Named Character** (NPC), **NEW Location**, or **NEW Unique Item** (One-of-a-kind), you MUST generate their full data stats into JSON BLOCK.
+       - (New means not in DB yet)
+       - Do not generate data for generic mobs (e.g., "Marine Soldier A"). Only for significant entities.
     
     [RELATIONSHIP SYSTEM (Friendship)]
     1. **Scale:** -1000 to +1000.
@@ -343,6 +356,8 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
         3. [Choice C]        
     
     5. **JSON Block:** strictly at the end.
+       - **PURE JSON ONLY:** Do NOT include comments (e.g., // or /* */) inside the JSON block.
+       - **NO TRAILING COMMAS:** Ensure the last item in a list/object does not have a comma.
        Format: 
        ```json 
        {{ 
