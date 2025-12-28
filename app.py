@@ -250,12 +250,6 @@ with st.sidebar:
 st.header("🌊 One Piece AI RPG: Persistent World")
 
 # Render History
-# for message in st.session_state.chat_history:
-#     with st.chat_message(message["role"]):
-#         st.markdown(message["content"])
-#         if "debug_json" in message:
-#             with st.expander("🔍 System Log"):
-#                 st.code(message["debug_json"], language="json")
 for message in st.session_state.chat_history:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
@@ -419,29 +413,6 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
                         db.setdefault('log', []).append(new_log[:150])
 
                     # 3. อัปเดต Player (ไม่ต้องเข้า 'updates' แล้ว ดึงจาก root เลย)
-                    if 'player' in data:
-                        p_up = data['player']
-                        # Inventory: เขียนทับเลย (เพราะ AI มักส่ง list ล่าสุดมา)
-                        if 'inventory' in p_up: db['player']['inventory'] = p_up['inventory']
-                        # Location: เช็คความชัวร์
-                        if 'current_location' in p_up:
-                            db['player']['location'] = p_up['current_location']
-                        # Stats: ใช้ .update() เพื่อแก้เฉพาะค่าที่เปลี่ยน
-                        if 'stats' in p_up: db['player']['stats'].update(p_up['stats'])
-                        # Reputation: ใช้ .update()
-                        if 'reputation' in p_up:
-                            if 'reputation' not in db['player']: db['player']['reputation'] = {}
-                            db['player']['reputation'].update(p_up['reputation'])
-                        # Vehicle: (เผื่อรถพัง)
-                        if 'vehicle' in p_up and 'status' in p_up['vehicle']:
-                            db['player']['vehicle']['status'].update(p_up['vehicle']['status'])
-                        if 'exp' in p_up: db['player']['exp'].update(p_up['exp'])
-                        if 'level' in p_up: db['player']['level'].update(p_up['level'])
-                        if 'abilities' in p_up: db['player']['traits']['abilities'].update(p_up['abilities'])
-                        if 'devil_fruit' in p_up: db['player']['devil_fruit'].update(p_up['devil_fruit'])
-                        if 'crew' in p_up: db['player']['crew'].update(p_up['crew'])
-                        if 'haki' in p_up: db['player']['haki'].update(p_up['haki'])
-
                     if 'player' in data:
                         p_up = data['player']
 
