@@ -54,6 +54,11 @@ def ask_gemini_crosscheck(gpt_response, full_system_prompt):
     validator_instruction = f"""
     You are the "Editor-in-Chief" for a One Piece RPG.
     Your goal is to **CROSS-CHECK Logic** AND **REWRITE Narrative** to be more exciting.
+    
+    [CRITICAL RULE: DO NOT COPY]
+    - The Input is just a boring log. **NEVER copy sentences from the Input.**
+    - You MUST rewrite the scene from scratch using **Action Novel Style**.
+    - If the input says "Mosu attacked", you write "*ZWOOSH!* Mosu unleashed a sonic punch!"
 
     [YOUR MISSION]
     1. **Analyze:** Read the GPT Draft Response below.
@@ -61,10 +66,10 @@ def ask_gemini_crosscheck(gpt_response, full_system_prompt):
        - **Teleport Hack:** Did they move instantly across oceans? (e.g. East Blue -> New World). -> IF YES: REWRITE to "Lost at sea" or "Storm blocked".
        - **God Mode:** Did Lvl 1 beat a Boss? -> IF YES: REWRITE to "Instantly Defeated".
        - **Item Hack:** Used item not in inventory? -> IF YES: REWRITE to "Item not found".
-    3. **Narrative Polish (MANDATORY):**
+    3. **Narrative (MANDATORY REWRITE):** - Add **Sound Effects** (e.g., *DOOM!!*, *KABOOM!*, *Pik...*).
+       - Add **Inner Monologue** (What is the character thinking?).
+       - Make it dramatic, funny, or emotional (One Piece Spirit).
        - **DO NOT just copy the draft.** Even if the logic is correct, you MUST IMPROVE it.
-       - **REWRITE** the `[Event]` and `[NPC]` sections to be "One Piece Style" (Dramatic, Funny, Emotional, Action-packed).
-       - Add Sound Effects (e.g., *Doom!!*, *Fwoosh!*) and character tone.
     4. 3. **JSON Synchronization (CRITICAL):**
        - **Do NOT blindly copy the Draft JSON.**
        - If you changed the outcome (e.g. Success -> Fail), you **MUST** modify the JSON values (HP, Inventory, Location) to match YOUR new story.
@@ -84,7 +89,6 @@ def ask_gemini_crosscheck(gpt_response, full_system_prompt):
          "time_passed": {{ "days": 0, "hours": 0, "minutes": 0 }},
          "log_entry": "Summary log",
          "player": {{...}}, 
-         "world": {{...}},
          "characters": {{...}},
          "locations": {{...}},
          "unique_items": {{...}}
