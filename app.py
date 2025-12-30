@@ -50,76 +50,38 @@ def add_time(db, days=0, hours=0, minutes=0):
     db['world']['current_time'] = new_time.strftime(TIME_FMT)
 
 
-def ask_gemini_crosscheck(gpt_response, full_system_prompt):
+def ask_gemini_story(prompt, context):
     validator_instruction = f"""
-    You are the "Editor-in-Chief" for a One Piece RPG.
-    Your goal is to **CROSS-CHECK Logic** AND **REWRITE Narrative** to be more exciting.
-    
-    [CRITICAL RULE: DO NOT COPY]
-    - The Input is just a boring log. **NEVER copy sentences from the Input.**
-    - You MUST rewrite the scene from scratch using **Action Novel Style**.
-    - If the input says "Mosu attacked", you write "*ZWOOSH!* Mosu unleashed a sonic punch!"
+    You are the "Moderator" for a One Piece RPG.
+    Your goal is to **craft an exciting story and character dialogue**, and to **ENHANCE the Narrative**.
+    Tone: Exciting, Emotional, Dramatic (Shonen Manga Style). 
+    Language: Thai (Rich descriptions, Character Dialogues).
+
+    [STRICT NARRATIVE & DIALOGUE RULES]
+    1. **Dialogue is MANDATORY:** ห้ามเล่าสรุปเหตุการณ์เฉยๆ แต่ต้อง **"เขียนบทพูด"** ออกมาให้สมจริง
+    2. **Character Personality:** NPC ทุกตัวต้องมีนิสัยเฉพาะตัว (e.g., Nami, Villagers, Marines) และตอบโต้ตามสถานการณ์
+    3. **Reactive World:** โลกต้องตอบสนองต่อการกระทำ ถ้าผู้เล่นทำชั่ว บรรยากาศต้องกดดัน ถ้าทำดี ต้องได้รับการสรรเสริญ
 
     [YOUR MISSION]
-    1. **Analyze:** Read the GPT Draft Response below.
-    2. **Security Check (Logic Gate):**
-       - **Teleport Hack:** Did they move instantly across oceans? (e.g. East Blue -> New World). -> IF YES: REWRITE to "Lost at sea" or "Storm blocked".
-       - **God Mode:** Did Lvl 1 beat a Boss? -> IF YES: REWRITE to "Instantly Defeated".
-       - **Item Hack:** Used item not in inventory? -> IF YES: REWRITE to "Item not found".
-    3. **Narrative (MANDATORY REWRITE):** - Add **Sound Effects** (e.g., *DOOM!!*, *KABOOM!*, *Pik...*).
+    1. **Narrative (MANDATORY REWRITE):**
        - Add **Inner Monologue** (What is the character thinking?).
-       - Make it dramatic, funny, or emotional (One Piece Spirit).
-       - **DO NOT just copy the draft.** Even if the logic is correct, you MUST IMPROVE it.
-    4. 3. **JSON Synchronization (CRITICAL):**
-       - **Do NOT blindly copy the Draft JSON.**
-       - If you changed the outcome (e.g. Success -> Fail), you **MUST** modify the JSON values (HP, Inventory, Location) to match YOUR new story.
-       - *Example:* If you wrote that the player "got hit by a cannonball", the JSON `player.stats.hp` MUST decrease.
-       - *Example:* If you wrote that "The treasure was fake", the JSON `player.inventory` MUST NOT have the treasure.
+       - Make it dramatic, funny, or emotional (Capture the One Piece Spirit).
 
-    [STRICT OUTPUT FORMAT]
-    1. **[Event]:** (Rewrite this to be exciting, ~3-5 lines)
-    2. **[NPC]:** (Add lively dialogue/action. If none, keep empty)
-    3. **[Result]:** (Clear summary of consequences, fix if logic was wrong)
-    4. **Choices:** (Keep 3 choices)
-
-    5. **JSON Block:** strictly at the end. Recheck json value is 
-       Format: 
-       ```json 
-       {{ 
-         "time_passed": {{ "days": 0, "hours": 0, "minutes": 0 }},
-         "log_entry": "Summary log",
-         "player": {{...}}, 
-         "characters": {{...}},
-         "locations": {{...}},
-         "unique_items": {{...}}
-       }} 
-       ```
-
-    =========================================
-    [REFERENCE RULES & CONTEXT]
-    {full_system_prompt} 
-    =========================================
-    """
-
-    # ส่งเนื้อหาให้ตรวจ
-    content_to_review = f"""
-    --- DRAFT RESPONSE TO IMPROVE (FROM GPT) ---
-    {gpt_response}
+    {context}
     """
 
     try:
-        # ใช้ Flash เพื่อความเร็ว
         model = genai.GenerativeModel(
             model_name='gemini-1.5-flash-latest',
             system_instruction=validator_instruction
         )
 
-        response = model.generate_content(content_to_review)
+        response = model.generate_content(prompt)
         return response.text
 
     except Exception as e:
         print(f"[Gemini Crosscheck Error]: {e}")
-        return gpt_response  # ถ้า Gemini ล่ม ให้ใช้ของ GPT ไปก่อน
+        return prompt
 
 
 # ================= UI SETUP =================
@@ -292,6 +254,8 @@ for message in st.session_state.chat_history:
                         st.caption("ผ่านการ Cross-check แล้ว")
                         st.code(message.get("gemini_raw", "No Data"), language="markdown")
 
+previous_story = []
+
 # Handle Input
 if prompt := st.chat_input("สั่งการกัปตัน..."):
 
@@ -314,20 +278,34 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
     curr_loc_name = p['current_location']
     loc_data = db['locations'].get(curr_loc_name, {})
 
+    context = f"""
+    Previous story:{previous_story}
+    
+    [CONTEXT DATA]
+        Player: {json.dumps(p, ensure_ascii=False)}
+        World Status: {json.dumps(db['world'], ensure_ascii=False)}
+        Current Location Info: {json.dumps(loc_data, ensure_ascii=False)}
+        Settings: {json.dumps(db['settings'], ensure_ascii=False)}
+        Characters:  {json.dumps(db['characters'], ensure_ascii=False)}
+    """
+
+    gemini_story = ask_gemini_story(
+        prompt= prompt,
+        context= context
+    )
+    if len(previous_story) == 3:
+        previous_story.clear()
+    previous_story.append(gemini_story)
+
     system_prompt = f"""
     Role: Eiichiro Oda (Ultimate Game Master of One Piece RPG).
-    Tone: Exciting, Emotional, Dramatic (Shonen Manga Style). 
-    Language: Thai (Rich descriptions, Character Dialogues).
     
-    [STRICT NARRATIVE & DIALOGUE RULES]
-    1. **Dialogue is MUST:** ห้ามเล่าสรุปเหตุการณ์เฉยๆ แต่ต้อง **"เขียนบทพูด"** ออกมาให้สมจริง
-    2. **Character Personality:** NPC ต้องมีนิสัยเฉพาะตัว (Nami, Villagers, Marines) ตอบโต้ตามสถานการณ์
-    3. **Reactive World:** ถ้าผู้เล่นทำชั่ว บรรยากาศต้องกดดัน ถ้าทำดี ต้องได้รับการสรรเสริญ
-    
+    Story: {gemini_story}
+  
     [STRICT RULES - LOGIC & PROGRESSION]
     1. **NO Player Puppeteering:** NEVER write dialogue or internal thoughts for the Player (Mosu). Describe only external events and results.
     2. **Logic Gate (Anti-God Mode):**
-       - **Impossible Requests = FAILURE:** If a player asks to do something impossible (e.g., "Go to Laugh Tale" from East Blue, "Kill Kaido" at Lvl 1), the result MUST be **FAILURE**. 
+       - **Impossible Requests = FAILURE:** If the story describes an impossible (e.g., "Go to Laugh Tale" from East Blue, "Kill Kaido" at Lvl 1), the result MUST be **FAILURE**. 
        - **Punishment:** Describe the failure realistically (e.g., "You sailed out but got lost in a storm and returned to shore," or "The Sea King attacked you immediately").
     3. **Inventory Check:** BEFORE allowing item usage, verify if the item exists in Inventory.
     4. **Geography & Navigation (CRITICAL):**
@@ -344,12 +322,6 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
     1. **Scale:** -1000 to +1000.
     2. **Effect:** Affects NPC dialogue and willingness to help.
     3. **Dynamic Update:** ALWAYS return updated `friendship` in JSON if changed.
-    
-    [STRICT OUTPUT FORMAT]
-        You must follow this layout exactly:
-    1. **[Event]:** (Short description of what happened, 3-5 lines max. Focus on Action/Result)
-    2. **[NPC]:** (NPC Name says or NPC actions "..." - Only if NPC is present)
-    3. **[Result]:** (Summary: Success/Failure, HP loss, Location change status, etc)
     
     Stats MAX
     HP 1000000
@@ -372,13 +344,18 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
     Yonko -> HP 800000 stamina 40000 strength 4000 speed 4000
     Beast(Garp,Roger) -> HP 900000 stamina 45000 strength 4500 speed 4500
     Last boss -> HP 1000000 stamina 50000 strength 5000 speed 5000
+    
+        [STRICT OUTPUT FORMAT]
+        You must follow this layout exactly:
+    1. **Final story after verify imd improve.
+    2. **[Result]:** (Summary: Success/Failure, HP loss, Location change status, etc)
         
-    4. **Choices:**
+    3. **Choices:**
         1. [Choice A]
         2. [Choice B]
         3. [Choice C]        
     
-    5. **JSON Block:** strictly at the end.
+    4. **JSON Block:** strictly at the end.
        - **PURE JSON ONLY:** Do NOT include comments (e.g., // or /* */) inside the JSON block.
        - **NO TRAILING COMMAS:** Ensure the last item in a list/object does not have a comma.
        Format: 
@@ -393,7 +370,6 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
          "unique_items": {{...}}
        }} 
        ```
-
     [CONTEXT DATA]
     Player: {json.dumps(p, ensure_ascii=False)}
     World Status: {json.dumps(db['world'], ensure_ascii=False)}
@@ -415,21 +391,16 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
                 messages=messages_payload,
                 temperature=0.5,
             )
-            gpt_draft_content = response.choices[0].message.content
-
-            final_content = ask_gemini_crosscheck(
-                gpt_response=gpt_draft_content,
-                full_system_prompt=system_prompt
-            )
+            gpt_content = response.choices[0].message.content
 
             # Extract JSON
-            json_match = re.search(r"```json(.*?)```", final_content, re.DOTALL)
+            json_match = re.search(r"```json(.*?)```", gpt_content, re.DOTALL)
 
-            story_text = final_content
+            story_text = gpt_content
             json_str = ""
 
             if json_match:
-                story_text = final_content.replace(json_match.group(0), "").strip()
+                story_text = gpt_content.replace(json_match.group(0), "").strip()
                 print(story_text)  # แสดงเนื้อเรื่อง
 
                 # ดึง JSON string ออกมาแปลงเป็น Dict
@@ -559,8 +530,8 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
                 "debug_json": json_str,  # JSON string เพียวๆ
 
                 # >>> เพิ่ม 2 บรรทัดนี้ครับ <<<
-                "gpt_raw": gpt_draft_content,
-                "gemini_raw": final_content
+                "gpt_raw": gpt_content,
+                "gemini_raw": gemini_story
             })
 
 
