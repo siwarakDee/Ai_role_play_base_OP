@@ -70,9 +70,7 @@ def ask_gemini_story(prompt, context):
     {context}
     """
 
-    genai.GenerativeModel
-
-    # if model f error model_name='gemini-1.5-flash-latest',
+    # if model f error model_name='gemini-1.5-flash-latest'
 
     try:
         model = genai.GenerativeModel(
