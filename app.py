@@ -58,9 +58,11 @@ def ask_gemini_story(prompt, context):
     Language: Thai (Rich descriptions, Character Dialogues).
 
     [STRICT NARRATIVE & DIALOGUE RULES]
-    1. **Dialogue is MANDATORY:** ห้ามเล่าสรุปเหตุการณ์เฉยๆ แต่ต้อง **"เขียนบทพูด"** ออกมาให้สมจริง
+    1. **Dialogue is MANDATORY:** ห้ามเล่าสรุปเหตุการณ์เฉยๆ แต่ต้อง **"เขียนบทพูด"** ออกมาให้สมจริง ตามสถานการณ์ และ Context ที่ให้ หากอะไรที่ ไม่มีไม่คารเอามา
+    คุณควรเช็คก่อนตลอด เช่น Player มีพลังอะไร ผลปีศาจมีไหม ฮาคิมีไหม พลังเท่าไหร่เทียบกับศัตรู ตอนนี้อยู่ที่ไหน ดูจากข้อมูลที่ให้ก่อนคิดเนื้อเรื่อง
     2. **Character Personality:** NPC ทุกตัวต้องมีนิสัยเฉพาะตัว (e.g., Nami, Villagers, Marines) และตอบโต้ตามสถานการณ์
     3. **Reactive World:** โลกต้องตอบสนองต่อการกระทำ ถ้าผู้เล่นทำชั่ว บรรยากาศต้องกดดัน ถ้าทำดี ต้องได้รับการสรรเสริญ
+    4. **คุณไม่ได้มีหน้าที่อัพเดทค่าสถานะต่างๆ
 
     [YOUR MISSION]
     1. **Narrative (MANDATORY REWRITE):**
@@ -289,11 +291,11 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
         Settings: {json.dumps(db['settings'], ensure_ascii=False)}
         Characters:  {json.dumps(db['characters'], ensure_ascii=False)}
     """
-
-    gemini_story = ask_gemini_story(
-        prompt= prompt,
-        context= context
-    )
+    with st.spinner("Calculating..."):
+        gemini_story = ask_gemini_story(
+            prompt= prompt,
+            context= context
+         )
     if len(previous_story) == 3:
         previous_story.clear()
     previous_story.append(gemini_story)
