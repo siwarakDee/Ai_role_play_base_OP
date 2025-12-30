@@ -69,12 +69,11 @@ def ask_gemini_story(prompt, context):
 
     {context}
     """
-
     # if model f error model_name='gemini-1.5-flash-latest'
 
     try:
         model = genai.GenerativeModel(
-            model_name='gemini-1.5-flash',
+            model_name='gemini-2.5-flash',
             system_instruction=validator_instruction
         )
 
