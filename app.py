@@ -299,6 +299,8 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
 
     system_prompt = f"""
     Role: Eiichiro Oda (Ultimate Game Master of One Piece RPG).
+    Tone: Exciting, Emotional, Dramatic (Shonen Manga Style). 
+    Language: Thai (Rich descriptions, Character Dialogues).
     
     Story: {gemini_story}
   
