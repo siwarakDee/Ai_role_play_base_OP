@@ -25,7 +25,8 @@ genai.configure(api_key=google_api_key)
 client = openai.OpenAI(api_key=api_key)
 
 DB_FILE = 'db.json'
-DIALOG_FILE = 'dialog.json'  # ไฟล์ใหม่สำหรับเก็บแชท
+DIALOG_FILE = 'dialog.json'
+PROMPT_FILE = 'prompt.json'
 TIME_FMT = "%Y-%m-%d %H:%M:%S"
 
 
@@ -49,28 +50,14 @@ def add_time(db, days=0, hours=0, minutes=0):
     new_time = curr + timedelta(days=days, hours=hours, minutes=minutes)
     db['world']['current_time'] = new_time.strftime(TIME_FMT)
 
+previous_story = []
+prompt_data = load_json(PROMPT_FILE)
 
 def ask_gemini_story(prompt, context):
-    validator_instruction = f"""
-    You are the "Moderator" for a One Piece RPG.
-    Your goal is to **craft an exciting story and character dialogue**, and to **ENHANCE the Narrative**.
-    Tone: Exciting, Emotional, Dramatic (Shonen Manga Style). 
-    Language: Thai (Rich descriptions, Character Dialogues).
-
-    [STRICT NARRATIVE & DIALOGUE RULES]
-    1. **Dialogue is MANDATORY:** ห้ามเล่าสรุปเหตุการณ์เฉยๆ แต่ต้อง **"เขียนบทพูด"** ออกมาให้สมจริง ตามสถานการณ์ และ Context ที่ให้ หากอะไรที่ ไม่มีไม่คารเอามา
-    คุณควรเช็คก่อนตลอด เช่น Player มีพลังอะไร ผลปีศาจมีไหม ฮาคิมีไหม พลังเท่าไหร่เทียบกับศัตรู ตอนนี้อยู่ที่ไหน ดูจากข้อมูลที่ให้ก่อนคิดเนื้อเรื่อง
-    2. **Character Personality:** NPC ทุกตัวต้องมีนิสัยเฉพาะตัว (e.g., Nami, Villagers, Marines) และตอบโต้ตามสถานการณ์
-    3. **Reactive World:** โลกต้องตอบสนองต่อการกระทำ ถ้าผู้เล่นทำชั่ว บรรยากาศต้องกดดัน ถ้าทำดี ต้องได้รับการสรรเสริญ
-    4. **คุณไม่ได้มีหน้าที่อัพเดทค่าสถานะต่างๆ
-
-    [YOUR MISSION]
-    1. **Narrative (MANDATORY REWRITE):**
-       - Add **Inner Monologue** (What is the character thinking?).
-       - Make it dramatic, funny, or emotional (Capture the One Piece Spirit).
-
-    {context}
-    """
+    validator_instruction = prompt_data.get("story_prompt", "").format(
+        context=context,  # เอาตัวแปร context ใส่แทนที่ {context}
+        previous_story=previous_story  # เอาตัวแปร previous_story ใส่แทนที่ {previous_story}
+    )
     # if model f error model_name='gemini-1.5-flash-latest'
 
     try:
@@ -209,6 +196,90 @@ with st.sidebar:
 
     st.divider()
 
+    st.subheader("📂 File Manager")
+    tab_db, tab_dialog, tab_prompt = st.tabs(["DB", "Dialog", "Prompt"])
+    with tab_db:
+        st.write("จัดการข้อมูลผู้เล่น (db.json)")
+
+        # Download
+        if os.path.exists(DB_FILE):
+            with open(DB_FILE, "rb") as f:
+                st.download_button(
+                    label="⬇️ Download DB",
+                    data=f,
+                    file_name="db.json",
+                    mime="application/json"
+                )
+
+        # Upload
+        uploaded_db = st.file_uploader("Upload DB", type=["json"], key="up_db")
+        if uploaded_db:
+            try:
+                # แปลงไฟล์ที่อัปโหลดเป็น Dict แล้วเซฟทับ
+                new_data = json.load(uploaded_db)
+                save_json(DB_FILE, new_data)
+                st.success("✅ อัปเดต DB สำเร็จ! (Reloading...)")
+                st.rerun()  # รีเฟรชหน้าจอทันที
+            except Exception as e:
+                st.error(f"ไฟล์ JSON เสียหาย: {e}")
+
+    # ================= 2. Dialog Manager =================
+    with tab_dialog:
+        st.write("จัดการประวัติแชท (dialog.json)")
+
+        # Download
+        if os.path.exists(DIALOG_FILE):
+            with open(DIALOG_FILE, "rb") as f:
+                st.download_button(
+                    label="⬇️ Download Dialog",
+                    data=f,
+                    file_name="dialog.json",
+                    mime="application/json"
+                )
+
+        # Upload
+        uploaded_dialog = st.file_uploader("Upload Dialog", type=["json"], key="up_dialog")
+        if uploaded_dialog:
+            try:
+                new_data = json.load(uploaded_dialog)
+                save_json(DIALOG_FILE, new_data)
+                # โหลดเข้า session state ด้วยถ้าจำเป็น
+                # st.session_state.chat_history = new_data
+                st.success("✅ อัปเดต Dialog สำเร็จ!")
+                st.rerun()
+            except Exception as e:
+                st.error(f"ไฟล์เสียหาย: {e}")
+
+    # ================= 3. Prompt Manager (New!) =================
+    with tab_prompt:
+        st.write("แก้ Prompt ทันที (prompt.json)")
+
+        # Download
+        if os.path.exists(PROMPT_FILE):
+            with open(PROMPT_FILE, "rb") as f:
+                st.download_button(
+                    label="⬇️ Download Prompts",
+                    data=f,
+                    file_name="prompt.json",
+                    mime="application/json"
+                )
+
+        # Upload
+        uploaded_prompt = st.file_uploader("Upload Prompts", type=["json"], key="up_prompt")
+        if uploaded_prompt:
+            try:
+                new_data = json.load(uploaded_prompt)
+                # เช็คหน่อยว่ามี Key ครบไหม
+                if "system_prompt" in new_data:
+                    save_json(PROMPT_FILE, new_data)
+                    st.success("✅ เปลี่ยน Prompt เรียบร้อย!")
+                    st.rerun()
+                else:
+                    st.error("JSON ต้องมี key 'system_prompt'")
+            except Exception as e:
+                st.error(f"ไฟล์เสียหาย: {e}")
+
+    st.divider()
     # 6. SYSTEM CONTROLS
     if st.button("🗑️ Reset Story", type="primary", use_container_width=True):
 
@@ -257,8 +328,6 @@ for message in st.session_state.chat_history:
                         st.caption("ผ่านการ Cross-check แล้ว")
                         st.code(message.get("gemini_raw", "No Data"), language="markdown")
 
-previous_story = []
-
 # Handle Input
 if prompt := st.chat_input("สั่งการกัปตัน..."):
 
@@ -300,81 +369,33 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
         previous_story.clear()
     previous_story.append(gemini_story)
 
-    system_prompt = f"""
-    Role: Eiichiro Oda (Ultimate Game Master of One Piece RPG).
-    Tone: Exciting, Emotional, Dramatic (Shonen Manga Style). 
-    Language: Thai (Rich descriptions, Character Dialogues).
-    
-    Story: {gemini_story}
-  
-    [STRICT RULES - LOGIC & PROGRESSION]
-    1. **NO Player Puppeteering:** NEVER write dialogue or internal thoughts for the Player (Mosu). Describe only external events and results.
-    2. **Logic Gate (Anti-God Mode):**
-       - **Impossible Requests = FAILURE:** If the story describes an impossible (e.g., "Go to Laugh Tale" from East Blue, "Kill Kaido" at Lvl 1), the result MUST be **FAILURE**. 
-       - **Punishment:** Describe the failure realistically (e.g., "You sailed out but got lost in a storm and returned to shore," or "The Sea King attacked you immediately").
-    3. **Inventory Check:** BEFORE allowing item usage, verify if the item exists in Inventory.
-    4. **Geography & Navigation (CRITICAL):**
-       - **Connection Only:** Player can ONLY travel to locations connected in the `loc_data`.
-       - **Grand Line Physics:** You CANNOT go straight to 'Laugh Tale' (Raftel) or 'New World' from 'East Blue'. You must follow the route: East Blue -> Reverse Mountain -> Paradise -> New World.
-       - **Laugh Tale Lock:** Attempting to go to Laugh Tale without 4 Road Poneglyphs results in getting lost in the mist/storms forever.
-       - **EXCEPTION:** 'Bartholomew Kuma' crew member allows Fast Travel (ignores connection).
-    5. **Battle System:** Analyze Stats. Do NOT let low-stats players beat Bosses.
-    6. **World Expansion (NEW!):** - IF the story introduces a **NEW Named Character** (NPC), **NEW Location**, or **NEW Unique Item** (One-of-a-kind), you MUST generate their full data stats into JSON BLOCK.
-       - (New means not in DB yet)
-       - Do not generate data for generic mobs (e.g., "Marine Soldier A"). Only for significant entities.
-    
-    [RELATIONSHIP SYSTEM (Friendship)]
-    1. **Scale:** -1000 to +1000.
-    2. **Effect:** Affects NPC dialogue and willingness to help.
-    3. **Dynamic Update:** ALWAYS return updated `friendship` in JSON if changed.
-    
-    Stats MAX
-    HP 1000000
-    stamina 50000
-    strength 5000
-    speed 5000
-    
-    [Stats Cap]
-    Normal people -> HP 10 stamina 10 strength 10 speed 10
-    Normal Navy -> HP 50 stamina 20 strength 20 speed 20
-    Special race,Super nova (Starter) -> HP 500 stamina 100 strength 100 speed 100
-    Normal Strong Navy -> HP 1000 stamina 150 strength 150 speed 150
-    Elite Strong Navy(trooper level) -> HP 5000 stamina 300 strength 300 speed 300
-    Elite Strong Navy(Commander level) -> HP 20000 stamina 600 strength 600 speed 600
-    Special agent (Starter), New world level -> HP 50000 stamina 1000 strength 1000 speed 1000
-    Vice admiral -> HP 150000 stamina 1300 strength 1300 speed 1300
-    worse generation (Start in new world) -> HP 200000 stamina 15000 strength 1500 speed 1500
-    Yonko general (King, Katakuri) -> HP 400000 stamina 20000 strength 2000 speed 2000
-    Admiral -> HP 650000 stamina 30000 strength 3000 speed 3000
-    Yonko -> HP 800000 stamina 40000 strength 4000 speed 4000
-    Beast(Garp,Roger) -> HP 900000 stamina 45000 strength 4500 speed 4500
-    Last boss -> HP 1000000 stamina 50000 strength 5000 speed 5000
-    
-        [STRICT OUTPUT FORMAT]
+    story = f"Story: {gemini_story}"
+    outout_format = f"""
+    [STRICT OUTPUT FORMAT]
         You must follow this layout exactly:
-    1. **Final story after verify imd improve.
-    2. **[Result]:** (Summary: Success/Failure, HP loss, Location change status, etc)
-        
-    3. **Choices:**
-        1. [Choice A]
-        2. [Choice B]
-        3. [Choice C]        
-    
-    4. **JSON Block:** strictly at the end.
-       - **PURE JSON ONLY:** Do NOT include comments (e.g., // or /* */) inside the JSON block.
-       - **NO TRAILING COMMAS:** Ensure the last item in a list/object does not have a comma.
-       Format: 
-       ```json 
-       {{ 
-         "time_passed": {{ "days": 0, "hours": 0, "minutes": 0 }},
-         "log_entry": "Summary of what happened",
-         "player": {{...}}, 
-         "world": {{...}},
-         "characters": {{...}},
-         "locations": {{...}},
-         "unique_items": {{...}}
-       }} 
-       ```
+        1. **Final story after verify imd improve.
+        2. **[Result]:** (Summary: Success/Failure, HP loss, Location change status, etc)   
+        3. **Choices:**
+            1. [Choice A]
+            2. [Choice B]
+            3. [Choice C]        
+        4. **JSON Block:** strictly at the end.
+           - **PURE JSON ONLY:** Do NOT include comments (e.g., // or /* */) inside the JSON block.
+           - **NO TRAILING COMMAS:** Ensure the last item in a list/object does not have a comma.
+           Format: 
+           ```json 
+           {{ 
+             "time_passed": {{ "days": 0, "hours": 0, "minutes": 0 }},
+             "log_entry": "Summary of what happened",
+             "player": {{...}}, 
+             "world": {{...}},
+             "characters": {{...}},
+             "locations": {{...}},
+             "unique_items": {{...}}
+           }} 
+           ```
+    """
+    context_data = f"""
     [CONTEXT DATA]
     Player: {json.dumps(p, ensure_ascii=False)}
     World Status: {json.dumps(db['world'], ensure_ascii=False)}
@@ -382,6 +403,9 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
     Settings: {json.dumps(db['settings'], ensure_ascii=False)}
     Characters:  {json.dumps(db['characters'], ensure_ascii=False)}
     """
+    raw_template = prompt_data.get("system_prompt", "")
+
+    system_prompt = raw_template + "\n" + story + "\n" + outout_format + "\n" + context_data
 
     messages_payload = [{"role": "system", "content": system_prompt}]
     # ส่งประวัติ 6 ข้อความล่าสุดให้ AI อ่าน (ไม่ส่งทั้งหมดเพื่อประหยัด Token)
@@ -531,10 +555,8 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
             # st.session_state.chat_history.append(ai_msg)
             st.session_state.chat_history.append({
                 "role": "assistant",
-                "content": story_text,  # เนื้อเรื่องที่ผ่านการตัด JSON ออกแล้ว
-                "debug_json": json_str,  # JSON string เพียวๆ
-
-                # >>> เพิ่ม 2 บรรทัดนี้ครับ <<<
+                "content": story_text,
+                "debug_json": json_str,
                 "gpt_raw": gpt_content,
                 "gemini_raw": gemini_story
             })
