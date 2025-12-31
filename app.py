@@ -51,7 +51,7 @@ def add_time(db, days=0, hours=0, minutes=0):
     db['world']['current_time'] = new_time.strftime(TIME_FMT)
 
 previous_story = []
-prompt_data = load_json(PROMPT_FILE)
+prompt_data = load_json(PROMPT_FILE,None)
 
 def ask_gemini_story(prompt, context):
     validator_instruction = prompt_data.get("story_prompt", "").format(
