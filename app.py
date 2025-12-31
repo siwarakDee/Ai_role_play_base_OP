@@ -77,9 +77,11 @@ def ask_gemini_story(prompt, context):
 # ================= UI SETUP =================
 st.set_page_config(page_title="One Piece RPG", page_icon="🏴‍☠️", layout="wide")
 
+dialog_db = load_json(DIALOG_FILE, [])
+
 # 1. โหลดประวัติแชทจากไฟล์ (ถ้ามี)
 if "chat_history" not in st.session_state:
-    st.session_state.chat_history = load_json(DIALOG_FILE, [])
+    st.session_state.chat_history = dialog_db
 
 # 2. โหลด Database เกม
 db = load_json(DB_FILE, None)
@@ -186,13 +188,23 @@ with st.sidebar:
     st.divider()
 
     with st.expander("🛠️ Debug: Raw Database (JSON)", expanded=False):
-
-        # ปุ่มกด Refresh เผื่อค่าไม่ไม่อัปเดต
         if st.button("🔄 Refresh Data"):
             st.rerun()
-
-        # แสดง JSON ทั้งก้อน (Interactive: กดลูกศรพับ/กางดูได้เลย)
         st.json(db)
+
+    st.divider()
+
+    with st.expander("🛠️ Debug: Raw Prompt (JSON)", expanded=False):
+        if st.button("🔄 Refresh Data"):
+            st.rerun()
+        st.json(prompt_data)
+
+    st.divider()
+
+    with st.expander("🛠️ Debug: Raw Dialog (JSON)", expanded=False):
+        if st.button("🔄 Refresh Data"):
+            st.rerun()
+        st.json(dialog_db)
 
     st.divider()
 
