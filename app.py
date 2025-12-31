@@ -188,21 +188,21 @@ with st.sidebar:
     st.divider()
 
     with st.expander("🛠️ Debug: Raw Database (JSON)", expanded=False):
-        if st.button("🔄 Refresh Data"):
+        if st.button("🔄 Refresh DB"):
             st.rerun()
         st.json(db)
 
     st.divider()
 
     with st.expander("🛠️ Debug: Raw Prompt (JSON)", expanded=False):
-        if st.button("🔄 Refresh Data"):
+        if st.button("🔄 Refresh Prompt"):
             st.rerun()
         st.json(prompt_data)
 
     st.divider()
 
     with st.expander("🛠️ Debug: Raw Dialog (JSON)", expanded=False):
-        if st.button("🔄 Refresh Data"):
+        if st.button("🔄 Refresh Dialog"):
             st.rerun()
         st.json(dialog_db)
 
