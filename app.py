@@ -188,9 +188,10 @@ with st.sidebar:
     st.divider()
 
     with st.expander("🛠️ Debug: Raw Database (JSON)", expanded=False):
+        db_text = json.dumps(db, indent=4, ensure_ascii=False)
         edited_json_str = st.text_area(
             "📝 แก้ไข JSON DB ตรงนี้:",
-            value=db,
+            value=db_text,
             height=500,
             key="db_editor"
         )
@@ -213,7 +214,8 @@ with st.sidebar:
 
         with col2:
             if st.button("🔄 Reset View DB", key="btn_reset_db"):
-
+                if "db_editor" in st.session_state:
+                    del st.session_state["db_editor"]
                 st.rerun()
 
     st.divider()
