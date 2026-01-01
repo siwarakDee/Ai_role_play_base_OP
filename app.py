@@ -201,14 +201,7 @@ with st.sidebar:
         with col1:
             if st.button("💾 Save & Refresh DB", key="btn_save_db"):
                 try:
-                    new_db_data = edited_json_str.value.decode("utf-8")
-
-                    # เซฟลงไฟล์ทันที
-                    save_json(DB_FILE, new_db_data)
-
-                    # แจ้งเตือนและรีเฟรช
-                    st.toast("✅ Database Updated Successfully!", icon="💾")
-                    st.rerun()
+                    print(edited_json_str)
 
                 except json.JSONDecodeError as e:
                     st.error(f"❌ JSON พังครับเช็ควงเล็บหรือลูกน้ำใหม่!\nError: {e}")
