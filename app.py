@@ -73,7 +73,7 @@ def ask_gemini_story(prompt, context):
 
     except Exception as e:
         print(f"[Gemini Crosscheck Error]: {e}")
-        return f"error {e.message}"
+        return f"error {e}"
 
 
 # ================= UI SETUP =================
