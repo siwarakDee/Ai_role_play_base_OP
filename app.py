@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import os
 import re
 import shutil
+import time
 import google.generativeai as genai
 
 # ================= CONFIG =================
@@ -204,8 +205,10 @@ with st.sidebar:
                 try:
                     new_data = json.loads(edited_json_str)
                     save_json(DB_FILE, new_data)
-                    if "db_editor" in st.session_state:
-                        del st.session_state["db_editor"]
+
+                    st.toast("✅ Database Updated Successfully!", icon="💾")
+                    time.sleep(1.5)
+
                     st.rerun()
                 except json.JSONDecodeError as e:
                     st.error(f"❌ JSON พังครับเช็ควงเล็บหรือลูกน้ำใหม่!\nError: {e}")
@@ -214,16 +217,17 @@ with st.sidebar:
 
         with col2:
             if st.button("🔄 Reset View DB", key="btn_reset_db"):
-                if "db_editor" in st.session_state:
-                    del st.session_state["db_editor"]
+                st.session_state["db_editor"] = db_text
+
                 st.rerun()
 
     st.divider()
 
     with st.expander("🛠️ Debug: Raw Prompt (JSON)", expanded=False):
+        prompt_text = json.dumps(prompt_data, indent=4, ensure_ascii=False)
         edited_json_prompt = st.text_area(
             "📝 แก้ไข JSON prompt ตรงนี้:",
-            value=prompt_data,
+            value=prompt_text,
             height=500,
             key="prompt_editor"
         )
@@ -234,16 +238,13 @@ with st.sidebar:
         with col1:
             if st.button("💾 Save & Refresh Prompt", key="btn_save_prompt"):
                 try:
-                    # แปลง String กลับเป็น Dict
                     new_p_data = json.loads(edited_json_prompt)
-
-                    # เซฟลงไฟล์ทันที
                     save_json(PROMPT_FILE, new_p_data)
 
-                    # แจ้งเตือนและรีเฟรช
                     st.toast("✅ Database Updated Successfully!", icon="💾")
-                    st.rerun()
+                    time.sleep(1.5)
 
+                    st.rerun()
                 except json.JSONDecodeError as e:
                     st.error(f"❌ JSON พังครับเช็ควงเล็บหรือลูกน้ำใหม่!\nError: {e}")
                 except Exception as e:
@@ -251,15 +252,16 @@ with st.sidebar:
 
         with col2:
             if st.button("🔄 Reset View Prompt", key="btn_reset_prompt"):
-                st.session_state["prompt_editor"] = prompt_data
+                st.session_state["prompt_editor"] = prompt_text
                 st.rerun()
 
     st.divider()
 
     with st.expander("🛠️ Debug: Raw Dialog (JSON)", expanded=False):
+        dialog_text = json.dumps(dialog_db, indent=4, ensure_ascii=False)
         edited_json_dialog = st.text_area(
             "📝 แก้ไข JSON prompt ตรงนี้:",
-            value=dialog_db,
+            value=dialog_text,
             height=500,
             key="dialog_editor"
         )
@@ -270,14 +272,12 @@ with st.sidebar:
         with col1:
             if st.button("💾 Save & Refresh Dialog", key="btn_save_dialog"):
                 try:
-                    # แปลง String กลับเป็น Dict
                     new_d_data = json.loads(edited_json_dialog)
-
-                    # เซฟลงไฟล์ทันที
                     save_json(DIALOG_FILE, new_d_data)
 
-                    # แจ้งเตือนและรีเฟรช
                     st.toast("✅ Database Updated Successfully!", icon="💾")
+                    time.sleep(1.5)
+
                     st.rerun()
 
                 except json.JSONDecodeError as e:
@@ -287,7 +287,7 @@ with st.sidebar:
 
         with col2:
             if st.button("🔄 Reset View Dialog", key="btn_reset_dialog"):
-                st.session_state["dialog_editor"] = dialog_db
+                st.session_state["dialog_editor"] = dialog_text
                 st.rerun()
 
     st.divider()
