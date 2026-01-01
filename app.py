@@ -252,6 +252,7 @@ with st.sidebar:
 
         with col2:
             if st.button("🔄 Reset View Prompt", key="btn_reset_prompt"):
+                print(prompt_text)
                 st.session_state["prompt_editor"] = prompt_text
                 st.rerun()
 
