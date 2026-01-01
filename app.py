@@ -225,37 +225,58 @@ with st.sidebar:
     st.divider()
 
     with st.expander("🛠️ Debug: Raw Prompt (JSON)", expanded=False):
-        prompt_text = json.dumps(prompt_data, indent=4, ensure_ascii=False)
-        edited_json_prompt = st.text_area(
-            "📝 แก้ไข JSON prompt ตรงนี้:",
-            value=prompt_text,
-            height=500,
-            key="prompt_editor"
-        )
+        current_system = str(prompt_data.get("system_prompt", ""))
+        current_story = str(prompt_data.get("story_prompt", ""))
+
+        # 2. สร้าง Tabs แยกกันเลย จะได้ไม่งง
+        tab1, tab2 = st.tabs(["⚙️ System Prompt", "📖 Story Prompt"])
+
+        with tab1:
+            st.caption("กฎหลักของเกม (System Prompt)")
+            # height สูงๆ จะได้เหมือนเขียน Word
+            new_system_prompt = st.text_area(
+                "แก้ไข System Prompt:",
+                value=current_system,
+                height=400,
+                key="input_system_prompt"
+            )
+
+        with tab2:
+            st.caption("คำสั่งดำเนินเรื่อง (Story Prompt)")
+            new_story_prompt = st.text_area(
+                "แก้ไข Story Prompt:",
+                value=current_story,
+                height=400,
+                key="input_story_prompt"
+            )
 
         # 3. ปุ่ม Save
         col1, col2 = st.columns([1, 1])
 
         with col1:
-            if st.button("💾 Save & Refresh Prompt", key="btn_save_prompt"):
+            if st.button("💾 Save Prompts", key="btn_save_visual_prompt"):
                 try:
-                    new_p_data = json.loads(edited_json_prompt)
-                    save_json(PROMPT_FILE, new_p_data)
+                    new_prompt_data = {
+                        "system_prompt": new_system_prompt,
+                        "story_prompt": new_story_prompt
+                    }
+                    save_json(PROMPT_FILE, new_prompt_data)
 
-                    st.toast("✅ Database Updated Successfully!", icon="💾")
-                    time.sleep(1.5)
-
+                    st.toast("✅ บันทึก Prompt เรียบร้อย!", icon="💾")
+                    time.sleep(1)
                     st.rerun()
-                except json.JSONDecodeError as e:
-                    st.error(f"❌ JSON พังครับเช็ควงเล็บหรือลูกน้ำใหม่!\nError: {e}")
+
                 except Exception as e:
                     st.error(f"❌ Error: {e}")
 
         with col2:
             st.button(
-                "🔄 Reset View Prompt",
-                key="btn_reset_prompt",
-                on_click=lambda: st.session_state.update({"prompt_editor": prompt_text})
+                "🔄 Discard & Reset All",
+                key="btn_reset_prompts",
+                on_click=lambda: st.session_state.update({
+                    "input_system_prompt": current_system,
+                    "input_story_prompt": current_story
+                })
             )
 
     st.divider()
