@@ -213,12 +213,7 @@ with st.sidebar:
 
         with col2:
             if st.button("🔄 Reset View DB", key="btn_reset_db"):
-                edited_json_str = st.text_area(
-                    "📝 แก้ไข JSON DB ตรงนี้:",
-                    value=db,
-                    height=500,
-                    key="db_editor"
-                )
+
                 st.rerun()
 
     st.divider()
