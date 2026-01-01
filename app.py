@@ -188,23 +188,107 @@ with st.sidebar:
     st.divider()
 
     with st.expander("🛠️ Debug: Raw Database (JSON)", expanded=False):
-        if st.button("🔄 Refresh DB"):
-            st.rerun()
-        st.json(db)
+        edited_json_str = st.text_area(
+            "📝 แก้ไข JSON DB ตรงนี้:",
+            value=db,
+            height=500,
+            key="db_editor"
+        )
+
+        # 3. ปุ่ม Save
+        col1, col2 = st.columns([1, 1])
+
+        with col1:
+            if st.button("💾 Save & Refresh DB", key="btn_save_db"):
+                try:
+                    # แปลง String กลับเป็น Dict
+                    new_db_data = json.loads(edited_json_str)
+
+                    # เซฟลงไฟล์ทันที
+                    save_json(DB_FILE, new_db_data)
+
+                    # แจ้งเตือนและรีเฟรช
+                    st.toast("✅ Database Updated Successfully!", icon="💾")
+                    st.rerun()
+
+                except json.JSONDecodeError as e:
+                    st.error(f"❌ JSON พังครับเช็ควงเล็บหรือลูกน้ำใหม่!\nError: {e}")
+                except Exception as e:
+                    st.error(f"❌ Error: {e}")
+
+        with col2:
+            if st.button("🔄 Reset View DB", key="btn_reset_db"):
+                st.rerun()
 
     st.divider()
 
     with st.expander("🛠️ Debug: Raw Prompt (JSON)", expanded=False):
-        if st.button("🔄 Refresh Prompt"):
-            st.rerun()
-        st.json(prompt_data)
+        edited_json_prompt = st.text_area(
+            "📝 แก้ไข JSON prompt ตรงนี้:",
+            value=prompt_data,
+            height=500,
+            key="prompt_editor"
+        )
+
+        # 3. ปุ่ม Save
+        col1, col2 = st.columns([1, 1])
+
+        with col1:
+            if st.button("💾 Save & Refresh Prompt", key="btn_save_prompt"):
+                try:
+                    # แปลง String กลับเป็น Dict
+                    new_p_data = json.loads(edited_json_prompt)
+
+                    # เซฟลงไฟล์ทันที
+                    save_json(PROMPT_FILE, new_p_data)
+
+                    # แจ้งเตือนและรีเฟรช
+                    st.toast("✅ Database Updated Successfully!", icon="💾")
+                    st.rerun()
+
+                except json.JSONDecodeError as e:
+                    st.error(f"❌ JSON พังครับเช็ควงเล็บหรือลูกน้ำใหม่!\nError: {e}")
+                except Exception as e:
+                    st.error(f"❌ Error: {e}")
+
+        with col2:
+            if st.button("🔄 Reset View Prompt", key="btn_reset_prompt"):
+                st.rerun()
 
     st.divider()
 
     with st.expander("🛠️ Debug: Raw Dialog (JSON)", expanded=False):
-        if st.button("🔄 Refresh Dialog"):
-            st.rerun()
-        st.json(dialog_db)
+        edited_json_dialog = st.text_area(
+            "📝 แก้ไข JSON prompt ตรงนี้:",
+            value=dialog_db,
+            height=500,
+            key="prompt_editor"
+        )
+
+        # 3. ปุ่ม Save
+        col1, col2 = st.columns([1, 1])
+
+        with col1:
+            if st.button("💾 Save & Refresh Dialog", key="btn_save_dialog"):
+                try:
+                    # แปลง String กลับเป็น Dict
+                    new_d_data = json.loads(edited_json_dialog)
+
+                    # เซฟลงไฟล์ทันที
+                    save_json(DIALOG_FILE, new_d_data)
+
+                    # แจ้งเตือนและรีเฟรช
+                    st.toast("✅ Database Updated Successfully!", icon="💾")
+                    st.rerun()
+
+                except json.JSONDecodeError as e:
+                    st.error(f"❌ JSON พังครับเช็ควงเล็บหรือลูกน้ำใหม่!\nError: {e}")
+                except Exception as e:
+                    st.error(f"❌ Error: {e}")
+
+        with col2:
+            if st.button("🔄 Reset View Dialog", key="btn_reset_dialog"):
+                st.rerun()
 
     st.divider()
 
