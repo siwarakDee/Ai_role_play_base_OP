@@ -201,8 +201,11 @@ with st.sidebar:
         with col1:
             if st.button("💾 Save & Refresh DB", key="btn_save_db"):
                 try:
-                    save_json(DB_FILE, edited_json_str)
-
+                    new_data = json.loads(edited_json_str)
+                    save_json(DB_FILE, new_data)
+                    if "db_editor" in st.session_state:
+                        del st.session_state["db_editor"]
+                    st.rerun()
                 except json.JSONDecodeError as e:
                     st.error(f"❌ JSON พังครับเช็ควงเล็บหรือลูกน้ำใหม่!\nError: {e}")
                 except Exception as e:
@@ -210,7 +213,12 @@ with st.sidebar:
 
         with col2:
             if st.button("🔄 Reset View DB", key="btn_reset_db"):
-                st.session_state["db_editor"] = db
+                edited_json_str = st.text_area(
+                    "📝 แก้ไข JSON DB ตรงนี้:",
+                    value=db,
+                    height=500,
+                    key="db_editor"
+                )
                 st.rerun()
 
     st.divider()
