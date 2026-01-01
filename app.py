@@ -218,6 +218,8 @@ with st.sidebar:
 
         with col2:
             if st.button("🔄 Reset View DB", key="btn_reset_db"):
+                if "db_editor" in st.session_state:
+                    del st.session_state["db_editor"]
                 st.rerun()
 
     st.divider()
@@ -253,6 +255,8 @@ with st.sidebar:
 
         with col2:
             if st.button("🔄 Reset View Prompt", key="btn_reset_prompt"):
+                if "prompt_editor" in st.session_state:
+                    del st.session_state["prompt_editor"]
                 st.rerun()
 
     st.divider()
@@ -288,6 +292,8 @@ with st.sidebar:
 
         with col2:
             if st.button("🔄 Reset View Dialog", key="btn_reset_dialog"):
+                if "dialog_editor" in st.session_state:
+                    del st.session_state["dialog_editor"]
                 st.rerun()
 
     st.divider()
