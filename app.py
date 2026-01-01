@@ -262,7 +262,7 @@ with st.sidebar:
             "📝 แก้ไข JSON prompt ตรงนี้:",
             value=dialog_db,
             height=500,
-            key="prompt_editor"
+            key="dialog_editor"
         )
 
         # 3. ปุ่ม Save
