@@ -1,6 +1,6 @@
 {
   "world": {
-    "current_time": "1524-03-20 14:05:00",
+    "current_time": "1524-03-21 02:35:00",
     "timeline": [
       {
         "id": "EVT_NEW_WORLD_01",
@@ -85,24 +85,24 @@
         "Mantis Punch (หมัดความเร็วเสียง)",
         "Water Breathing (หายใจในน้ำ)",
         "Fishman Karate (คาราเต้เงือก ขั้นต้น)",
-        "Iai Trisula Slash 500 Heads (Iai with mantis punch speed in fishman style Mosu original) "
+        "Iai Trisula Slash 500 Heads (Iai with mantis punch speed in fishman style Mosu original)"
       ],
       "description": "มนุษย์เงือกสายพันธุ์กั้งตั๊กแตน ผู้ใช้ดาบคาตานะ มีแรงดีดและพลังหมัดมหาศาล"
     },
     "stats": {
       "hp": 550,
       "hp_percentage": 100,
-      "stamina": 120,
-      "stamina_percent": 100,
-      "strength": 140,
-      "speed": 115,
-      "bounty": 1500
+      "stamina": 68,
+      "stamina_percent": 56,
+      "strength": 160,
+      "speed": 130,
+      "bounty": 2000
     },
     "reputation": {
       "Marines": -10,
-      "Pirates": 10,
+      "Pirates": 20,
       "Revolutionary": 0,
-      "Fishman Island": 50
+      "Fishman Island": 60
     },
     "devil_fruit": {
       "has_fruit": false
@@ -133,7 +133,7 @@
       "creator": "Enzo (Dressrosa)",
       "status": {
         "hull_condition": 100,
-        "fuel_dial": 100,
+        "fuel_dial": 95,
         "is_deployed": true
       },
       "features": [
@@ -144,7 +144,7 @@
       ],
       "note": "พาหนะเดินทางความเร็วสูง S+ เน้นดำรงชีวิต ไม่ใช่อาวุธสงคราม"
     },
-    "current_location": "Aron park",
+    "current_location": "Near Baratie",
     "crew": []
   },
   "characters": {
@@ -273,6 +273,10 @@
   "log": [
     "เริ่มออกเดินทางด้วย Sea-Phantom GT คู่ใจ",
     "Mosu trained diligently every day, improving his sword skills and speed significantly.",
-    "โมสุสำเร็จในการสร้างท่าใหม่ 'อิไอ ตรีศูรสะบั้น 500เศียร' ที่รวดเร็วและทรงพลัง"
+    "โมสุสำเร็จในการสร้างท่าใหม่ 'อิไอ ตรีศูรสะบั้น 500เศียร' ที่รวดเร็วและทรงพลัง",
+    "Mosu trained his Iai technique and lifted a 500 kg stone pillar, improving his strength and swordsmanship.",
+    "Mosu trained his Iai technique to a higher speed, pushing his limits.",
+    "Mosu traveled to Baratie to confront Don Krieg.",
+    "Mosu defeated Don Krieg using Iai Trisula Slash 500 Heads. Increased reputation and bounty."
   ]
 }

@@ -6,6 +6,7 @@ import os
 import re
 import shutil
 import time
+import re
 import google.generativeai as genai
 
 # ================= CONFIG =================
@@ -67,8 +68,8 @@ def ask_gemini_story(prompt, context):
             system_instruction=validator_instruction
         )
 
-        response = model.generate_content(prompt)
-        return response.text
+        gemini_clean_response = re.sub(r'([a-zA-Z\u0E00-\u0E7F])\1{10,}', r'\1\1\1\1\1', model.generate_content(prompt).text)
+        return gemini_clean_response
 
     except Exception as e:
         print(f"[Gemini Crosscheck Error]: {e}")
