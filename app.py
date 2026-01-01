@@ -216,10 +216,11 @@ with st.sidebar:
                     st.error(f"❌ Error: {e}")
 
         with col2:
-            if st.button("🔄 Reset View DB", key="btn_reset_db"):
-                st.session_state["db_editor"] = db_text
-
-                st.rerun()
+            st.button(
+                "🔄 Reset View DB",
+                key="btn_reset_db",
+                on_click=lambda: st.session_state.update({"db_editor": db_text})
+            )
 
     st.divider()
 
@@ -251,10 +252,11 @@ with st.sidebar:
                     st.error(f"❌ Error: {e}")
 
         with col2:
-            if st.button("🔄 Reset View Prompt", key="btn_reset_prompt"):
-                print(prompt_text)
-                st.session_state["prompt_editor"] = prompt_text
-                st.rerun()
+            st.button(
+                "🔄 Reset View Prompt",
+                key="btn_reset_prompt",
+                on_click=lambda: st.session_state.update({"prompt_editor": prompt_text})
+            )
 
     st.divider()
 
@@ -287,9 +289,11 @@ with st.sidebar:
                     st.error(f"❌ Error: {e}")
 
         with col2:
-            if st.button("🔄 Reset View Dialog", key="btn_reset_dialog"):
-                st.session_state["dialog_editor"] = dialog_text
-                st.rerun()
+            st.button(
+                "🔄 Reset View Dialog",
+                key="btn_reset_dialog",
+                on_click=lambda: st.session_state.update({"dialog_editor": dialog_text})
+            )
 
     st.divider()
 
