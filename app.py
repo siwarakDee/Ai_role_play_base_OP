@@ -57,10 +57,9 @@ prompt_data = load_json(PROMPT_FILE,None)
 
 def ask_gemini_story(prompt, context):
     validator_instruction = prompt_data.get("story_prompt", "").format(
-        context=context,  # เอาตัวแปร context ใส่แทนที่ {context}
-        previous_story=previous_story  # เอาตัวแปร previous_story ใส่แทนที่ {previous_story}
+        context=context,
+        previous_story=previous_story
     )
-    # if model f error model_name='gemini-1.5-flash-latest'
 
     try:
         model = genai.GenerativeModel(
@@ -539,7 +538,7 @@ if prompt := st.chat_input("สั่งการกัปตัน..."):
     with st.spinner("Calculating..."):
         try:
             response = client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-5.2-pro",
                 messages=messages_payload,
                 temperature=0.5,
             )
